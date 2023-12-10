@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nonja"
+version = "0.1.0"
+authors = [
+    {name="Thomas Corey", email="tcorey@intriguedeviation.com"}
+]
+description = "A static site generator using Python, Jinja2, SASS, and other tools."
+readme = "README.md"
+requires-python = ">= 3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "Jinja2",
+    "lxml"
+]
+
+[project.urls]
+Homepage = "https://github.com/intriguedeviation/nonja-py"
+Issues = "https://github.com/intriguedeviation/nonja-py/issues"
+
+[project.scripts]
+nj = "nonja.cli:main"

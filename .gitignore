@@ -1,0 +1,11 @@
+# macos noise
+.DS_Store
+
+# local folders
+env
+dist
+
+# python noise
+__pycache__
+*.pyc
+*.pyo
