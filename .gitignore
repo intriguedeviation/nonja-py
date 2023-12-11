@@ -4,8 +4,13 @@
 # local folders
 env
 dist
+build
+.yarn
 
 # python noise
 __pycache__
 *.pyc
 *.pyo
+.pnp.cjs
+.pnp.loader.mjs
+

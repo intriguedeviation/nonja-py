@@ -1,9 +1,50 @@
 from os import makedirs, path, getcwd
 
-from nonja.style import green, bold, reset
+from nonja.style import bold, reset
 import nonja.console as console
 
 def scaffold_project():
+    _create_source_folders()
+    _create_npm_package()
+
+    content_readme_path = path.join(getcwd(), 'src/README.md')
+    if not path.exists(content_readme_path):
+        with open(content_readme_path, 'w') as content_readme:
+            content_readme.write("\n".join([
+                '# Source files',
+                '',
+                f"Path: `{path.join(getcwd(), 'src')}`",
+                '',
+                'This is the source folder for your project. Each subfolder serves a particular purpose:',
+                '',
+                '* `content`: Contains the content pages for your site.',
+                '* `drawings`: Contains any SVG assets you create for your site.',
+                '* `images`: Contains image assets for your site.',
+                '* `styles`: Contains SCSS assets that will be transformed to CSS.'
+            ]))
+
+
+# ---
+
+def _create_source_folders():
+    project_paths = [
+        path.join(getcwd(), 'build'),
+        path.join(getcwd(), 'src/content'),
+        path.join(getcwd(), 'src/drawings'),
+        path.join(getcwd(), 'src/images'),
+        path.join(getcwd(), 'src/styles')
+    ]
+
+    console.info(f"Scaffolding project structure in {bold}{getcwd()}{reset}")
+    for project_path in project_paths:
+        if not path.exists(project_path):
+            console.info(f"Creating path {bold}{project_path}{reset}")
+            makedirs(project_path)
+        else:
+            console.info(f"Path {bold}{project_path}{reset} exists, skipping.")
+
+
+def _create_npm_package():
     # Create package manifest for use with NPM / Yarn
     package_content = {
         'name': 'untitled-site',
@@ -32,35 +73,3 @@ def scaffold_project():
         json.dump(package_content, package_file, indent=2)
 
     console.info(f"Wrote package manifest {bold}{package_file_path}{reset}")
-
-    project_paths = [
-        path.join(getcwd(), 'build'),
-        path.join(getcwd(), 'src/content'),
-        path.join(getcwd(), 'src/drawings'),
-        path.join(getcwd(), 'src/images'),
-        path.join(getcwd(), 'src/styles')
-    ]
-
-    console.info(f"Scaffolding project structure in {bold}{getcwd()}{reset}")
-    for project_path in project_paths:
-        if not path.exists(project_path):
-            console.info(f"Creating path {bold}{project_path}{reset}")
-            makedirs(project_path)
-        else:
-            console.info(f"Path {bold}{project_path}{reset} exists, skipping.")
-
-    content_readme_path = path.join(getcwd(), 'src/README.md')
-    if not path.exists(content_readme_path):
-        with open(content_readme_path, 'w') as content_readme:
-            content_readme.write("\n".join([
-                '# Source files',
-                '',
-                f"Path: `{path.join(getcwd(), 'src')}`",
-                '',
-                'This is the source folder for your project. Each subfolder serves a particular purpose:',
-                '',
-                '* `content`: Contains the content pages for your site.',
-                '* `drawings`: Contains any SVG assets you create for your site.',
-                '* `images`: Contains image assets for your site.',
-                '* `styles`: Contains SCSS assets that will be transformed to CSS.'
-            ]))
