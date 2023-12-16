@@ -52,7 +52,7 @@ def _create_npm_package():
         'description': 'Package file for Node-based tools and resources',
         'private': True,
         'license': 'UNLICENSED',
-        'ninjaProject': {
+        'nonjaProject': {
             'title': 'Untitled Site',
             'author': 'Untitled Site Team',
             'description': 'A description of the untitled site',

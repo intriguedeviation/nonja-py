@@ -18,7 +18,8 @@ classifiers = [
 ]
 dependencies = [
     "Jinja2",
-    "lxml"
+    "lxml",
+    "pyyaml"
 ]
 
 [project.urls]

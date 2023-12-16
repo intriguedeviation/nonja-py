@@ -26,12 +26,15 @@ def path_for(value: str) -> str:
 
 # ---
 
-def _site_title():
+def get_package_part():
     package_file_path = path.join(getcwd(), 'package.json')
     with open(package_file_path, 'r') as package_file:
         package_data = load(package_file)
 
-    project_part = package_data.get('ninjaProject', None)
+    return package_data.get('nonjaProject', None)
+
+def _site_title():
+    project_part = get_package_part()
     if project_part is None:
         return ''
     
@@ -39,11 +42,7 @@ def _site_title():
 
 
 def _site_description():
-    package_file_path = path.join(getcwd(), 'package.json')
-    with open(package_file_path, 'r') as package_file:
-        package_data = load(package_file)
-
-    project_part = package_data.get('ninjaProject', None)
+    project_part = get_package_part()
     if project_part is None:
         return ''
     
@@ -51,11 +50,7 @@ def _site_description():
 
 
 def _site_url():
-    package_file_path = path.join(getcwd(), 'package.json')
-    with open(package_file_path, 'r') as package_file:
-        package_data = load(package_file)
-
-    project_part = package_data.get('ninjaProject', None)
+    project_part = get_package_part()
     if project_part is None:
         return ''
     
@@ -63,11 +58,7 @@ def _site_url():
 
 
 def _site_author():
-    package_file_path = path.join(getcwd(), 'package.json')
-    with open(package_file_path, 'r') as package_file:
-        package_data = load(package_file)
-
-    project_part = package_data.get('ninjaProject', None)
+    project_part = get_package_part()
     if project_part is None:
         return ''
     

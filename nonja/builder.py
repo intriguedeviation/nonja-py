@@ -28,7 +28,7 @@ def build_project():
     else:
         console.info(f"Processing content from folder {bold}{content_folder_path}{reset}")
 
-    console.debug('Setting up Jinja environment.')
+    console.info('Setting up Jinja environment.')
     env = Environment(
         loader=FileSystemLoader(content_folder_path),
         autoescape=True
