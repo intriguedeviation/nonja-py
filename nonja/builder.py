@@ -12,6 +12,7 @@ import nonja.functions as functions
 
 
 def _run_package_manager():
+    # TODO: Feels like there might be a better manner of handling invoking the package manager.
     npm_lock_path = './package-lock.json'
     yarn_lock_path = './yarn.lock'
 
@@ -20,11 +21,12 @@ def _run_package_manager():
     elif path.exists(yarn_lock_path):
         system('yarn sass:build')
     elif not path.exists(npm_lock_path) and not path.exists(yarn_lock_path):
-        console.error(f"Package lock files could not be found, ignoring.")
+        console.error("Package lock files could not be found, ignoring.")
 
 
 def rebuild_project():
     # Remove existing build folder
+    # TODO: Need to use file removal methods from Python instead of this.
     build_folder_path = path.join('.', 'build')
     system(f"rm -rf {build_folder_path}")
     build_project()
