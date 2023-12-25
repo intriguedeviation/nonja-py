@@ -10,6 +10,8 @@ from nonja.generator import generate_content
 
 def main():
     print(f"{blue}Nonja SSG{reset} for Python v{version}")
+    print('Docs available from https://nonja.intriguedeviation.com')
+    print('')
     
     if len(argv) == 1:
         print_usage()
