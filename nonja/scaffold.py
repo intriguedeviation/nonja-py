@@ -18,6 +18,7 @@ def scaffold_project():
                 'This is the source folder for your project. Each subfolder serves a particular purpose:',
                 '',
                 '* `content`: Contains the content pages for your site.',
+                '* `data`: Contains data segments that can be imported into pages.',
                 '* `drawings`: Contains any SVG assets you create for your site.',
                 '* `images`: Contains image assets for your site.',
                 '* `styles`: Contains SCSS assets that will be transformed to CSS.'
@@ -30,6 +31,7 @@ def _create_source_folders():
     project_paths = [
         path.join(getcwd(), 'build'),
         path.join(getcwd(), 'src/content'),
+        path.join(getcwd(), 'src/data'),
         path.join(getcwd(), 'src/drawings'),
         path.join(getcwd(), 'src/images'),
         path.join(getcwd(), 'src/styles')

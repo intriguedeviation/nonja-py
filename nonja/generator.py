@@ -17,7 +17,8 @@ def generate_content(*args):
         'style': _generate_style,
         'drawing': _generate_drawing,
         'gitignore': _generate_gitignore,
-        'docker-compose': _generate_docker_compose
+        'docker-compose': _generate_docker_compose,
+        'data': _generate_data,
     }
 
     generator_key = args[0]
@@ -71,6 +72,15 @@ def _generate_style(style_name):
         scss_file.write(scss_content.encode())
     
     console.info(f"Created SCSS file at {bold}{scss_file_path}{reset}")
+
+
+def _generate_data(filename):
+    file_content = '[]'
+    file_path = path.join(getcwd(), f"src/data/{filename}.json")
+    with open(file_path, 'wb') as data_file:
+        data_file.write(file_content.encode())
+    
+    console.info(f"Created data file at {bold}{file_path}{reset}")
 
 
 def _generate_drawing(*args):

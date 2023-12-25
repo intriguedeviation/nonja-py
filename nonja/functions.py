@@ -21,6 +21,16 @@ def path_for(value: str) -> str:
     return output_url
 
 
+def import_json(value: str):
+    data_file_path = path.join('src/data', f"{value}.json")
+    if path.exists(data_file_path):
+        with open(data_file_path, 'rb') as data_file:
+            data_content = load(data_file)
+            return data_content
+
+    return []
+
+
 def _site_title():
     project_part = get_package_part()
     if project_part is None:

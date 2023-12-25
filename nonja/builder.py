@@ -49,12 +49,15 @@ def build_project():
     )
 
     env.filters={
-        'date': filters.datetime_format
+        'date': filters.datetime_format,
+        'encode': filters.encode,
+        'yahv': filters.yahv
     }
 
     env.globals.update(
         path_for=functions.path_for,
-        site=functions.site
+        site=functions.site,
+        data=functions.import_json
     )
 
     source_folder_path = 'src/content'
