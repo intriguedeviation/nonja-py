@@ -2,6 +2,7 @@ from os import getcwd, path, makedirs
 from datetime import datetime
 from lxml.builder import E
 import lxml.etree as et
+from json import load
 
 import nonja.console as console
 from nonja.style import bold, reset
@@ -52,9 +53,12 @@ def _generate_page(filename, template_name='shared'):
 def _generate_template(template_name):
     console.debug(f"Template generation requested for template {bold}{template_name}{reset}")
 
+    config = _get_project_config()
+    content = _template_default if config.get('projectType', 'web') == 'web' else _book_template_default
+    
     template_file_path = path.join(getcwd(), f"src/content/_{template_name}.html")
     with open(template_file_path, 'wb') as template_file:
-        template_file.write(_template_default.encode())
+        template_file.write(content.encode())
     
 
 def _generate_style(style_name):
@@ -141,6 +145,14 @@ def _generate_docker_compose():
     console.info(f"Generated Docker Compose at {bold}{compose_file_path}{reset}")
 
 
+def _get_project_config():
+    package_file_path = path.join(getcwd(), 'package.json')
+    with open(package_file_path, 'rb') as package_file:
+        package_content = load(package_file)
+    
+    return package_content.get('nonjaProject', None)
+
+
 _template_default = '''<!DOCTYPE html>
 <html lang="en-US">
     <head>
@@ -151,6 +163,16 @@ _template_default = '''<!DOCTYPE html>
     </head>
     <body>
         <!--Add template-level content here.-->
+        {% block content %}{% endblock %}
+    </body>
+</html>
+'''
+
+_book_template_default = '''<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+    </head>
+    <body>
         {% block content %}{% endblock %}
     </body>
 </html>

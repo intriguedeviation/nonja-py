@@ -21,7 +21,9 @@ def main():
     if command == 'serve':
         run_server()
     elif command == 'start':
-        scaffold_project()
+        print(f"Count of arguments for start command: {len(argv)}")
+        args = argv[2:] if len(argv) >= 3 else argv[1:]
+        scaffold_project(*args)
     elif command == 'build' or command == 'b':
         build_project()
     elif command == 'rebuild' or command == 'rb':

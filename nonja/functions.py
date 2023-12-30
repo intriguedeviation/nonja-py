@@ -10,13 +10,32 @@ def get_package_part():
 
 
 def path_for(value: str) -> str:
-    output_url = '/'
+    package_part = get_package_part()
+    project_type = package_part.get('projectType', 'web')
+
+    if project_type == 'web':
+        output_url = '/'
+        if value.endswith('index'):
+            value = value[:-len('index')]
+        
+        output_url += value
+        if not output_url.endswith('/'):
+            output_url += '.html'
+
+        return output_url
+    elif project_type == 'book':
+        output_url = value + '.xhtml'
+        return output_url
+    else:
+        pass
+
+    output_url = '/' if package_part.get('projectType', 'web') == 'web' else ''
     if value.endswith('index'):
         value = value[:-len('index')]
     
     output_url += value
     if not output_url.endswith('/'):
-        output_url += ".html"
+        output_url += ".html" if package_part.get('projectType', 'web') == 'web' else '.xhtml'
 
     return output_url
 

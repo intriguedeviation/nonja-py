@@ -1,5 +1,6 @@
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from os import path, getcwd
+from json import load
 
 from nonja.style import red, green, bold, reset
 
@@ -10,7 +11,14 @@ class BuildFolderHandler(SimpleHTTPRequestHandler):
 
 
 def run(server_class=HTTPServer, handler_class=BuildFolderHandler):
-    content_path = path.join(getcwd(), 'build')
+    package_file_path = path.join(getcwd(), 'package.json')
+    with open(package_file_path, 'rb') as package_file:
+        package = load(package_file)
+    
+    project_type = package.get('projectType', 'web')
+    content_path_part = 'build' if project_type == 'web' else 'build/content'
+
+    content_path = path.join(getcwd(), content_path_part)
     if not path.exists(content_path):
         print(f"{red}ERROR{reset}: Content folder, {bold}{content_path}{reset} could not be found, aborting.")
         exit(0)
