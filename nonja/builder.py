@@ -205,15 +205,24 @@ def _write_opf_package():
                 item_data['media-type'] = 'application/xhtml+xml'
                 if filename == 'nav.xhtml':
                     item_data['properties'] = 'nav'
-                
-                spines.append(E.itemref({'idref': item_identifier}))
+                    spines.insert(0, E.itemref({'idref': item_identifier}))
+                else:                
+                    spines.append(E.itemref({'idref': item_identifier}))
             elif filename.endswith('.css'):
                 item_data['media-type'] = 'text/css'
             elif filename.endswith('.svg'):
                 item_data['media-type'] = 'image/svg+xml'
             elif filename.endswith('.webp'):
                 item_data['media-type'] = 'image/webp'
-            items.append(E.item(item_data))
+            elif filename.endswith('.png'):
+                item_data['media-type'] = 'image/png'
+            elif filename.endswith('.jpg'):
+                item_data['media-type'] = 'image/jpeg'
+            
+            if filename == 'nav.xhtml':
+                items.insert(0, E.item(item_data))
+            else:
+                items.append(E.item(item_data))
 
     
     em = ElementMaker(namespace='http://www.idpf.org/2007/opf', nsmap={None: 'http://www.idpf.org/2007/opf', 'dc': 'http://purl.org/dc/elements/1.1/'})
