@@ -3,6 +3,8 @@ from os import path, getcwd
 from json import load
 
 from nonja.style import red, green, bold, reset
+import nonja.console as console
+
 
 class BuildFolderHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -25,7 +27,10 @@ def run(server_class=HTTPServer, handler_class=BuildFolderHandler):
 
     try:
         server_address = ('127.0.0.1', 5000)
-        print(f"{green}INFO{reset}: Serving content from {bold}{content_path}{reset} through {bold}http://{server_address[0]}:{server_address[1]}{reset}")
+
+        content_path_message = f"{bold}{content_path}{reset}"
+        content_server_message = f"{bold}http://{server_address[0]}:{server_address[1]}{reset}"
+        console.info(f"Serving content from {content_path_message} through {content_server_message}")
         httpd = server_class(server_address, handler_class)
         handler_class.directory = './build'
         httpd.serve_forever()

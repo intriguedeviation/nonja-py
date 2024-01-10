@@ -5,6 +5,7 @@ _debug = 'DEBUG'
 _warning = 'WARNING'
 _error = 'ERROR'
 
+
 def info(message: str) -> None:
     print(f"{green}{_info}{reset}: {message}")
 
@@ -16,6 +17,6 @@ def debug(message: str) -> None:
 def warn(message: str) -> None:
     print(f"{yellow}{_warning}{reset}: {message}")
 
+
 def error(message: str) -> None:
     print(f"{red}{_error}{reset}: {message}")
-

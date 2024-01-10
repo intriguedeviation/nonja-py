@@ -3,6 +3,7 @@ from os import makedirs, path, getcwd
 from nonja.style import bold, reset
 import nonja.console as console
 
+
 def scaffold_project(*args):
     _create_source_folders()
 
@@ -12,7 +13,6 @@ def scaffold_project(*args):
         _create_npm_package('book')
         _create_mimetype()
 
-# ---
 
 def _create_source_folders():
     project_paths = [

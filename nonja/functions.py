@@ -1,6 +1,7 @@
 from os import path, getcwd
 from json import load
 
+
 def get_package_part():
     package_file_path = path.join(getcwd(), 'package.json')
     with open(package_file_path, 'r') as package_file:
@@ -80,6 +81,7 @@ def _site_author():
         return ''
     
     return project_part.get('author', '')
+
 
 site = {
     'title': _site_title,

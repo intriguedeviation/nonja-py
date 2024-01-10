@@ -27,7 +27,6 @@ def _run_package_manager():
 
 
 def rebuild_project():
-    # Remove existing build folder
     # TODO: Need to use file removal methods from Python instead of this.
     build_folder_path = path.join('.', 'build')
     system(f"rm -rf {build_folder_path}")
@@ -54,7 +53,6 @@ def build_project():
     env.filters={
         'date': filters.datetime_format,
         'encode': filters.encode,
-        # 'yahv': filters.yahv
     }
 
     env.globals.update(
@@ -124,7 +122,10 @@ def _write_sitemap():
             if not filename.endswith('.html'):
                 continue
 
-            file_path = path.join(cwd, filename).replace(path.join(getcwd(), 'build'), project_base_url).replace('index.html', '')
+            file_path = (path.join(cwd, filename)
+                         .replace(path.join(getcwd(), 'build'), project_base_url)
+                         .replace('index.html', ''))
+
             sitemap_content.append(E.url(
                 E.loc(file_path),
                 E.lastmod(datetime.now().strftime('%Y-%m-%d'))
@@ -224,9 +225,15 @@ def _write_opf_package():
             else:
                 items.append(E.item(item_data))
 
-    
-    em = ElementMaker(namespace='http://www.idpf.org/2007/opf', nsmap={None: 'http://www.idpf.org/2007/opf', 'dc': 'http://purl.org/dc/elements/1.1/'})
-    dc = ElementMaker(namespace='http://purl.org/dc/elements/1.1/', nsmap={'dc': 'http://purl.org/dc/elements/1.1/'})
+    em = ElementMaker(
+        namespace='http://www.idpf.org/2007/opf',
+        nsmap={
+            None: 'http://www.idpf.org/2007/opf',
+            'dc': 'http://purl.org/dc/elements/1.1/'})
+    dc = ElementMaker(
+        namespace='http://purl.org/dc/elements/1.1/',
+        nsmap={
+            'dc': 'http://purl.org/dc/elements/1.1/'})
     
     book_identifier = 'book-' + unique_id
     package_content = em.package(
