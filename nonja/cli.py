@@ -6,7 +6,7 @@ from nonja.server import run as run_server
 from nonja.scaffold import scaffold_project
 from nonja.builder import build_project, rebuild_project
 from nonja.generator import generate_content
-
+from nonja.observer import watch_project
 
 def main():
     print(f"{blue}Nonja SSG{reset} for Python v{version}")
@@ -29,4 +29,6 @@ def main():
         rebuild_project()
     elif command == 'generate' or command == 'g':
         generate_content(*argv[2:])
+    elif command == 'watch' or command == 'w':
+        watch_project()
 

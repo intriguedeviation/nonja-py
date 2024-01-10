@@ -36,7 +36,7 @@ def rebuild_project():
 def build_project():
     project_config = _get_project_config()
     _run_package_manager()
-    
+
     content_folder_path = path.join(getcwd(), 'src/content')
     if not path.exists(content_folder_path):
         console.error(f"Content source path {bold}{content_folder_path}{reset} could not be found")
@@ -50,7 +50,7 @@ def build_project():
         autoescape=True
     )
 
-    env.filters={
+    env.filters = {
         'date': filters.datetime_format,
         'encode': filters.encode,
     }
@@ -80,10 +80,10 @@ def build_project():
 
             output_file_path = path.join(cwd, f"{file}").replace(source_folder_path, build_target_path)
             output_folder_path = path.dirname(output_file_path)
-            
+
             if not path.exists(output_folder_path):
                 makedirs(output_folder_path, exist_ok=True)
-            
+
             if project_config.get('projectType', 'web') == 'book':
                 output_file_path = output_file_path.replace('.html', '.xhtml')
 
@@ -106,7 +106,7 @@ def _write_sitemap():
     package_file_path = path.join(getcwd(), 'package.json')
     with open(package_file_path, 'rb') as package_file:
         package_content = json.load(package_file)
-    
+
     project_config = package_content.get('nonjaProject')
     project_base_url = project_config.get('domain')
 
@@ -150,7 +150,7 @@ Disallow:
     robots_file_path = './build/robots.txt'
     with open(robots_file_path, 'wb') as robots_file:
         robots_file.write(robots_file_content.encode())
-    
+
     console.info(f"Wrote {bold}robots.txt{reset} for the project.")
 
 
@@ -158,7 +158,7 @@ def _get_project_config():
     package_file_path = path.join(getcwd(), 'package.json')
     with open(package_file_path, 'rb') as package_file:
         package_content = load(package_file)
-    
+
     return package_content.get('nonjaProject', None)
 
 
@@ -166,19 +166,19 @@ def _write_container():
     container_content = E.container({
         'xmlns': 'urn:oasis:names:tc:opendocument:xmlns:container',
         'version': '1.0'
-        },
+    },
         E.rootfiles(
-            E.rootfile({ 'full-path': 'content/source.opf', 'media-type': 'application/oebps-package+xml'})
+            E.rootfile({'full-path': 'content/source.opf', 'media-type': 'application/oebps-package+xml'})
         )
     )
 
     container_file_path = path.join(getcwd(), 'build/META-INF/container.xml')
     if not path.exists(path.dirname(container_file_path)):
         makedirs(path.dirname(container_file_path), exist_ok=True)
-    
+
     with open(container_file_path, 'wb') as container_file:
         container_file.write(et.tostring(container_content))
-    
+
     console.info(f"Wrote container file for OEBPS pub format {bold}{container_file_path}{reset}.")
 
 
@@ -207,7 +207,7 @@ def _write_opf_package():
                 if filename == 'nav.xhtml':
                     item_data['properties'] = 'nav'
                     spines.insert(0, E.itemref({'idref': item_identifier}))
-                else:                
+                else:
                     spines.append(E.itemref({'idref': item_identifier}))
             elif filename.endswith('.css'):
                 item_data['media-type'] = 'text/css'
@@ -219,7 +219,7 @@ def _write_opf_package():
                 item_data['media-type'] = 'image/png'
             elif filename.endswith('.jpg'):
                 item_data['media-type'] = 'image/jpeg'
-            
+
             if filename == 'nav.xhtml':
                 items.insert(0, E.item(item_data))
             else:
@@ -234,7 +234,7 @@ def _write_opf_package():
         namespace='http://purl.org/dc/elements/1.1/',
         nsmap={
             'dc': 'http://purl.org/dc/elements/1.1/'})
-    
+
     book_identifier = 'book-' + unique_id
     package_content = em.package(
         {
@@ -268,7 +268,7 @@ def _write_opf_package():
     package_file_path = path.join(getcwd(), 'build/content/source.opf')
     with open(package_file_path, 'wb') as package_file:
         package_file.write(et.tostring(package_content, pretty_print=True))
-    
+
     console.info(f"Wrote OPF package file {bold}{package_file_path}{reset}")
 
 
@@ -277,5 +277,5 @@ def _write_mimetype():
     with open(content_file_path, 'wb') as content_file:
         content = 'application/epub+zip'
         content_file.write(content.encode('ascii'))
-    
+
     console.info(f"Wrote media type identification {bold}{content_file_path}{reset}")
