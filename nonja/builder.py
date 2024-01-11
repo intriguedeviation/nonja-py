@@ -1,4 +1,7 @@
 import json
+import re
+import sys
+import importlib
 import lxml.etree as et
 from os import path, walk, getcwd, makedirs, system
 from jinja2 import Environment, FileSystemLoader
@@ -44,6 +47,10 @@ def build_project():
     else:
         console.info(f"Processing content from folder {bold}{content_folder_path}{reset}")
 
+    x_filter_mod_name = path.join(getcwd(), 'filters.py')
+    if path.exists(x_filter_mod_name):
+        sys.path.insert(0, getcwd())
+
     console.info('Setting up Jinja environment.')
     env = Environment(
         loader=FileSystemLoader(content_folder_path),
@@ -54,6 +61,15 @@ def build_project():
         'date': filters.datetime_format,
         'encode': filters.encode,
     }
+
+    try:
+        x_filter_mod_name = 'filters'
+        x_filter_mod = importlib.import_module(x_filter_mod_name)
+        for f in dir(x_filter_mod):
+            if not f.startswith('__') and not f.startswith('_'):
+                env.filters[f] = getattr(x_filter_mod, f)
+    except ImportError as ie:
+        console.debug(f"Import error: {ie.msg}")
 
     env.globals.update(
         path_for=functions.path_for,
