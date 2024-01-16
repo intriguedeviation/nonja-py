@@ -2,15 +2,17 @@ from os import getcwd, path, makedirs
 from datetime import datetime
 from lxml.builder import E
 import lxml.etree as et
+from json import load
 
 import nonja.console as console
 from nonja.style import bold, reset
+
 
 def generate_content(*args):
     if len(args) == 0:
         console.warn(f"Received no arguments for generation, ignoring.")
         exit(0)
-    
+
     generators = {
         'page': _generate_page,
         'template': _generate_template,
@@ -31,7 +33,8 @@ def generate_content(*args):
 
 
 def _generate_page(filename, template_name='shared'):
-    console.debug(f"Page generation requested for page {bold}{filename}{reset} with template {bold}{template_name}{reset}")
+    console.debug(
+        f"Page generation requested for page {bold}{filename}{reset} with template {bold}{template_name}{reset}")
 
     page_content = '{%' + f" extends '_{template_name}.html' " + '%}' + _page_default
 
@@ -52,25 +55,28 @@ def _generate_page(filename, template_name='shared'):
 def _generate_template(template_name):
     console.debug(f"Template generation requested for template {bold}{template_name}{reset}")
 
+    config = _get_project_config()
+    content = _template_default if config.get('projectType', 'web') == 'web' else _book_template_default
+
     template_file_path = path.join(getcwd(), f"src/content/_{template_name}.html")
     with open(template_file_path, 'wb') as template_file:
-        template_file.write(_template_default.encode())
-    
+        template_file.write(content.encode())
+
 
 def _generate_style(style_name):
     scss_content = f"// File:      {style_name}.scss\n" + \
-    f"// Generated: {datetime.now().strftime('%Y-%m-%d')}" + \
-'''
+                   f"// Generated: {datetime.now().strftime('%Y-%m-%d')}" + \
+                   '''
 
 // Add your style declarations for this file.
 // Reference available from https://sass-lang.com
 // and playground available at https://www.sassmeister.com/
 '''
-    
+
     scss_file_path = path.join(getcwd(), f"src/styles/{style_name}.scss")
     with open(scss_file_path, 'wb') as scss_file:
         scss_file.write(scss_content.encode())
-    
+
     console.info(f"Created SCSS file at {bold}{scss_file_path}{reset}")
 
 
@@ -79,7 +85,7 @@ def _generate_data(filename):
     file_path = path.join(getcwd(), f"src/data/{filename}.json")
     with open(file_path, 'wb') as data_file:
         data_file.write(file_content.encode())
-    
+
     console.info(f"Created data file at {bold}{file_path}{reset}")
 
 
@@ -118,7 +124,7 @@ def _generate_gitignore():
     file_path = path.join(getcwd(), '.gitignore')
     with open(file_path, 'wb') as gitignore_file:
         gitignore_file.write(_gitignore_content.encode())
-    
+
     console.info(f"Generated gitignore at {bold}{file_path}{reset}")
 
 
@@ -137,8 +143,16 @@ def _generate_docker_compose():
     import yaml
     with open(compose_file_path, 'wb') as compose_file:
         compose_file.write(yaml.dump(compose_file_content).encode())
-    
+
     console.info(f"Generated Docker Compose at {bold}{compose_file_path}{reset}")
+
+
+def _get_project_config():
+    package_file_path = path.join(getcwd(), 'package.json')
+    with open(package_file_path, 'rb') as package_file:
+        package_content = load(package_file)
+
+    return package_content.get('nonjaProject', None)
 
 
 _template_default = '''<!DOCTYPE html>
@@ -151,6 +165,16 @@ _template_default = '''<!DOCTYPE html>
     </head>
     <body>
         <!--Add template-level content here.-->
+        {% block content %}{% endblock %}
+    </body>
+</html>
+'''
+
+_book_template_default = '''<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+    </head>
+    <body>
         {% block content %}{% endblock %}
     </body>
 </html>
