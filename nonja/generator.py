@@ -21,6 +21,7 @@ def generate_content(*args):
         'gitignore': _generate_gitignore,
         'docker-compose': _generate_docker_compose,
         'data': _generate_data,
+        'markdown': _generate_markdown,
     }
 
     generator_key = args[0]
@@ -50,6 +51,20 @@ def _generate_page(filename, template_name='shared'):
     template_file_path = path.join(getcwd(), f"src/content/_{template_name}.html")
     if not path.exists(template_file_path):
         _generate_template(template_name)
+
+
+def _generate_markdown(md_name):
+    console.debug(f"Markdown generation requested for content {bold}{md_name}{reset}")
+    md_content = f"# {md_name}\n\nThis is your new markdown file."
+
+    md_path = path.join(getcwd(), f"src/markdown/{md_name}.md")
+    md_folder_path = path.dirname(md_path)
+    if not path.exists(md_folder_path):
+        makedirs(md_folder_path, exist_ok=True)
+        console.debug(f"Created path for markdown source at {bold}{md_folder_path}{reset}")
+    
+    with open(md_path, 'wb') as md_file:
+        md_file.write(md_content.encode())
 
 
 def _generate_template(template_name):

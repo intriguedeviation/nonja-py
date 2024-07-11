@@ -54,7 +54,7 @@ def build_project():
     console.info('Setting up Jinja environment.')
     env = Environment(
         loader=FileSystemLoader(content_folder_path),
-        autoescape=True
+        autoescape=False
     )
 
     env.filters = {
@@ -68,13 +68,14 @@ def build_project():
         for f in dir(x_filter_mod):
             if not f.startswith('__') and not f.startswith('_'):
                 env.filters[f] = getattr(x_filter_mod, f)
-    except ImportError as ie:
-        console.debug(f"Import error: {ie.msg}")
+    except ImportError:
+        pass
 
     env.globals.update(
         path_for=functions.path_for,
         site=functions.site,
-        data=functions.import_json
+        data=functions.import_json,
+        markdown=functions.import_markdown,
     )
 
     source_folder_path = 'src/content'
