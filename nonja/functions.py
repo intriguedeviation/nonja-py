@@ -1,5 +1,6 @@
 from os import path, getcwd
 from json import load
+from markdown import markdown
 
 
 def get_package_part():
@@ -49,6 +50,16 @@ def import_json(value: str):
             return data_content
 
     return []
+
+
+def import_markdown(value: str):
+    md_file_path = path.join('src/markdown', f"{value}.md")
+    if path.exists(md_file_path):
+        with open(md_file_path, 'rb') as md_file:
+            md_content = md_file.read().decode()
+            return markdown(md_content, extensions=['extra'])
+        
+    return ''
 
 
 def _site_title():
