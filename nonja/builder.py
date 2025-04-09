@@ -100,7 +100,10 @@ def build_project(**args):
             template = env.get_template(content_file_path)
             result = template.render()
 
-            output_file_path = path.join(cwd, f"{file}").replace(source_folder_path, build_target_path)
+            content_file_base, _ = path.splitext(file)
+            markup_ext = ".html"
+
+            output_file_path = path.join(cwd, f"{content_file_base}{markup_ext}").replace(source_folder_path, build_target_path)
             output_folder_path = path.dirname(output_file_path)
 
             if not path.exists(output_folder_path):
