@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 from nonja.info import version
 from nonja.server import run as run_server
 from nonja.scaffold import scaffold_project
-from nonja.builder import build_project, rebuild_project
+from nonja.builder import build_project
 from nonja.generator import generate_content
 from nonja.observer import watch_project
 from nonja.migrator import migrate_content
@@ -15,7 +15,9 @@ def main():
     subparsers.add_parser("init-web", help="Initializes a new web project", aliases=["iw", "i"])
     subparsers.add_parser("init-epub", help="Initializes a new EPUB project", aliases=["ib"])
     subparsers.add_parser("serve-proj", help="Launches a local web server for the build content.", aliases=["s"])
-    subparsers.add_parser("build", help="Builds the current project content.", aliases=["b"])
+
+    build_parser = subparsers.add_parser("build", help="Builds the current project content.", aliases=["b"])
+    build_parser.add_argument("--include-assets", action="store_true")
     
     gen_parser = subparsers.add_parser("generate", help="Generates a scaffold for project content.", aliases=["g"])
     gen_parser.add_argument("type", action="store", choices=["page", "template", "style", "drawing", "data", "markdown", "project-file"])
@@ -36,7 +38,9 @@ def main():
         elif args.command == "serve-proj" or args.command == "s":
             run_server()
         elif args.command == "build" or args.command == "b":
-            build_project()
+            build_project(**{
+                "include-assets": args.include_assets
+            })
         elif args.command == "generate" or args.command == "g":
             generate_content(*[
                 args.type,
