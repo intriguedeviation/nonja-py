@@ -34,12 +34,15 @@ def generate_content(*args):
 
 
 def _generate_page(filename, template_name='shared'):
+    if len(template_name) == 0:
+        template_name = 'shared'
+
     console.debug(
         f"Page generation requested for page {bold}{filename}{reset} with template {bold}{template_name}{reset}")
 
-    page_content = '{%' + f" extends '_{template_name}.html' " + '%}' + _page_default
+    page_content = '{%' + f" extends '_{template_name}.j2' " + '%}' + _page_default
 
-    page_path = path.join(getcwd(), f"src/content/{filename}.html")
+    page_path = path.join(getcwd(), f"src/content/{filename}.j2")
     page_folder_path = path.dirname(page_path)
     if not path.exists(page_folder_path):
         makedirs(page_folder_path, exist_ok=True)
@@ -48,7 +51,7 @@ def _generate_page(filename, template_name='shared'):
     with open(page_path, 'wb') as page_file:
         page_file.write(page_content.encode())
 
-    template_file_path = path.join(getcwd(), f"src/content/_{template_name}.html")
+    template_file_path = path.join(getcwd(), f"src/content/_{template_name}.j2")
     if not path.exists(template_file_path):
         _generate_template(template_name)
 
@@ -73,7 +76,7 @@ def _generate_template(template_name):
     config = _get_project_config()
     content = _template_default if config.get('projectType', 'web') == 'web' else _book_template_default
 
-    template_file_path = path.join(getcwd(), f"src/content/_{template_name}.html")
+    template_file_path = path.join(getcwd(), f"src/content/_{template_name}.j2")
     with open(template_file_path, 'wb') as template_file:
         template_file.write(content.encode())
 
