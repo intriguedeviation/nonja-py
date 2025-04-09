@@ -79,13 +79,13 @@ def build_project():
     )
 
     source_folder_path = 'src/content'
-    build_target_path = 'build' if project_config.get('projectType', 'web') == 'web' else 'build/content'
+    build_target_path = 'build'
 
     build_tally = 0
 
     for cwd, _, files in walk(content_folder_path):
         for file in files:
-            if file.startswith('_') or not file.endswith('.html'):
+            if file.startswith('_') or not file.endswith('.j2'):
                 continue
 
             content_file_path = path.join(cwd.replace(content_folder_path, ''), file)
@@ -101,22 +101,14 @@ def build_project():
             if not path.exists(output_folder_path):
                 makedirs(output_folder_path, exist_ok=True)
 
-            if project_config.get('projectType', 'web') == 'book':
-                output_file_path = output_file_path.replace('.html', '.xhtml')
-
             with open(output_file_path, 'wb') as output_file:
                 output_file.write(result.encode())
                 build_tally += 1
 
     console.info(f"Wrote {bold}{build_tally}{reset} pages for the project.")
 
-    if project_config.get('projectType', 'web') == 'web':
-        _write_robots_file()
-        _write_sitemap()
-    else:
-        _write_container()
-        _write_opf_package()
-        _write_mimetype()
+    _write_robots_file()
+    _write_sitemap()
 
 
 def _write_sitemap():
@@ -177,122 +169,3 @@ def _get_project_config():
         package_content = load(package_file)
 
     return package_content.get('nonjaProject', None)
-
-
-def _write_container():
-    container_content = E.container({
-        'xmlns': 'urn:oasis:names:tc:opendocument:xmlns:container',
-        'version': '1.0'
-    },
-        E.rootfiles(
-            E.rootfile({'full-path': 'content/source.opf', 'media-type': 'application/oebps-package+xml'})
-        )
-    )
-
-    container_file_path = path.join(getcwd(), 'build/META-INF/container.xml')
-    if not path.exists(path.dirname(container_file_path)):
-        makedirs(path.dirname(container_file_path), exist_ok=True)
-
-    with open(container_file_path, 'wb') as container_file:
-        container_file.write(et.tostring(container_content))
-
-    console.info(f"Wrote container file for OEBPS pub format {bold}{container_file_path}{reset}.")
-
-
-def _write_opf_package():
-    config = _get_project_config()
-    unique_id = str(uuid4())
-    build_path = path.join(getcwd(), 'build/content')
-
-    items = []
-    spines = []
-
-    for cwd, _, files in walk(build_path):
-        files.sort()
-        for filename in files:
-            if filename.endswith('.opf'):
-                continue
-
-            item_identifier = f"content-{uuid4()}"
-            item_data = {
-                'id': item_identifier,
-                'href': path.join(cwd, filename).replace(f"{build_path}/", '')
-            }
-
-            if filename.endswith('.xhtml'):
-                item_data['media-type'] = 'application/xhtml+xml'
-                if filename == 'nav.xhtml':
-                    item_data['properties'] = 'nav'
-                    spines.insert(0, E.itemref({'idref': item_identifier}))
-                else:
-                    spines.append(E.itemref({'idref': item_identifier}))
-            elif filename.endswith('.css'):
-                item_data['media-type'] = 'text/css'
-            elif filename.endswith('.svg'):
-                item_data['media-type'] = 'image/svg+xml'
-            elif filename.endswith('.webp'):
-                item_data['media-type'] = 'image/webp'
-            elif filename.endswith('.png'):
-                item_data['media-type'] = 'image/png'
-            elif filename.endswith('.jpg'):
-                item_data['media-type'] = 'image/jpeg'
-
-            if filename == 'nav.xhtml':
-                items.insert(0, E.item(item_data))
-            else:
-                items.append(E.item(item_data))
-
-    em = ElementMaker(
-        namespace='http://www.idpf.org/2007/opf',
-        nsmap={
-            None: 'http://www.idpf.org/2007/opf',
-            'dc': 'http://purl.org/dc/elements/1.1/'})
-    dc = ElementMaker(
-        namespace='http://purl.org/dc/elements/1.1/',
-        nsmap={
-            'dc': 'http://purl.org/dc/elements/1.1/'})
-
-    book_identifier = 'book-' + unique_id
-    package_content = em.package(
-        {
-            'version': '3.0',
-            'dir': 'ltr',
-            'unique-identifier': book_identifier
-        },
-        em.metadata(
-            dc.identifier(
-                {'id': book_identifier},
-                f"urn:uuid:{unique_id}"
-            ),
-            dc.title(
-                config.get('title')
-            ),
-            dc.language(
-                'en-US'
-            ),
-            dc.creator(
-                config.get('author')
-            ),
-            em.meta(
-                {'property': 'dcterms:modified'},
-                datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-            )
-        ),
-        em.manifest(*items),
-        em.spine(*spines)
-    )
-
-    package_file_path = path.join(getcwd(), 'build/content/source.opf')
-    with open(package_file_path, 'wb') as package_file:
-        package_file.write(et.tostring(package_content, pretty_print=True))
-
-    console.info(f"Wrote OPF package file {bold}{package_file_path}{reset}")
-
-
-def _write_mimetype():
-    content_file_path = path.join(getcwd(), 'build/mimetype')
-    with open(content_file_path, 'wb') as content_file:
-        content = 'application/epub+zip'
-        content_file.write(content.encode('ascii'))
-
-    console.info(f"Wrote media type identification {bold}{content_file_path}{reset}")
