@@ -22,14 +22,15 @@ def generate_content(*args):
         'docker-compose': _generate_docker_compose,
         'data': _generate_data,
         'markdown': _generate_markdown,
+        'project-file': ''
     }
 
     generator_key = args[0]
     if generator_key in generators.keys():
         generator = generators[generator_key]
-        if args[1] == 'project-file' and args[2] == 'gitignore':
+        if args[1] == 'gitignore':
             _generate_gitignore()
-        elif args[1] == 'project-file' and args[2] == 'docker-compose':
+        elif args[1] == 'docker-compose':
             _generate_docker_compose()
         else:
             generator(*args[1:])
