@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nonja"
-version = "0.1.6-dev"
+version = "0.1.7-dev"
 description = "A static site generator using Python, Jinja2, SASS, and other tools."
 readme = "README.md"
 requires-python = ">= 3.10"

@@ -32,9 +32,9 @@ def main():
         args = parser.parse_args()
 
         if args.command == "init-web" or args.command == "iw" or args.command == "i":
-            scaffold_project(type="web")
+            scaffold_project("web")
         elif args.command == "init-epub" or args.command == "ib":
-            scaffold_project(type="book")
+            scaffold_project("book")
         elif args.command == "serve-proj" or args.command == "s":
             run_server()
         elif args.command == "build" or args.command == "b":
