@@ -12,8 +12,7 @@ def main():
     parser = ArgumentParser(description=f"Nonja SSG for Python v{version}")
     subparsers = parser.add_subparsers(dest="command", required=False)
     
-    subparsers.add_parser("init-web", help="Initializes a new web project", aliases=["iw", "i"])
-    subparsers.add_parser("init-epub", help="Initializes a new EPUB project", aliases=["ib"])
+    subparsers.add_parser("init", help="Initializes a new web project", aliases=["i"])
     subparsers.add_parser("serve-proj", help="Launches a local web server for the build content.", aliases=["s"])
 
     build_parser = subparsers.add_parser("build", help="Builds the current project content.", aliases=["b"])
@@ -31,10 +30,8 @@ def main():
     try:
         args = parser.parse_args()
 
-        if args.command == "init-web" or args.command == "iw" or args.command == "i":
+        if args.command == "init" or args.command == "i":
             scaffold_project("web")
-        elif args.command == "init-epub" or args.command == "ib":
-            scaffold_project("book")
         elif args.command == "serve-proj" or args.command == "s":
             run_server()
         elif args.command == "build" or args.command == "b":

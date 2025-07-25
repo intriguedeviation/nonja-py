@@ -62,7 +62,8 @@ def _generate_page(filename, template_name='shared'):
         _generate_template(template_name)
 
 
-def _generate_markdown(md_name):
+def _generate_markdown(*args):
+    md_name = args[0]
     console.debug(f"Markdown generation requested for content {bold}{md_name}{reset}")
     md_content = f"# {md_name}\n\nThis is your new markdown file."
 

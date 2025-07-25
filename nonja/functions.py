@@ -2,6 +2,7 @@ from os import path, getcwd
 from json import load
 from markdown import markdown
 
+import nonja.console as console
 
 def get_package_part():
     package_file_path = path.join(getcwd(), 'package.json')
@@ -54,11 +55,13 @@ def import_json(value: str):
 
 def import_markdown(value: str):
     md_file_path = path.join('src/markdown', f"{value}.md")
+
     if path.exists(md_file_path):
         with open(md_file_path, 'rb') as md_file:
             md_content = md_file.read().decode()
             return markdown(md_content, extensions=['extra'])
-        
+    else:
+        console.debug(f"markdown: md_file_path == {md_file_path} does not exist")
     return ''
 
 

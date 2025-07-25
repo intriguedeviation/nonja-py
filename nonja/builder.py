@@ -41,7 +41,6 @@ def build_project(**args):
     _run_package_manager()
 
     include_assets_flag = "include-assets"
-
     if include_assets_flag in args and args.get(include_assets_flag):
         _migrate_assets()
 

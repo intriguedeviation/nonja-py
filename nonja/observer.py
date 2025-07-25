@@ -7,7 +7,7 @@ import nonja.console as console
 
 
 def watch_project():
-    source_path = path.join(os.getcwd(), 'src/content')
+    source_path = path.join(os.getcwd(), 'src')
     console.info(f"Watching for changes on {source_path}")
     _watch_files(source_path, _on_file_change)
 
