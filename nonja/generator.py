@@ -22,12 +22,18 @@ def generate_content(*args):
         'docker-compose': _generate_docker_compose,
         'data': _generate_data,
         'markdown': _generate_markdown,
+        'project-file': ''
     }
 
     generator_key = args[0]
     if generator_key in generators.keys():
         generator = generators[generator_key]
-        generator(*args[1:])
+        if args[1] == 'gitignore':
+            _generate_gitignore()
+        elif args[1] == 'docker-compose':
+            _generate_docker_compose()
+        else:
+            generator(*args[1:])
     else:
         console.warn(f"Unknown generator requested with {bold}{generator_key}{reset}, ignoring")
         exit(0)
@@ -56,7 +62,8 @@ def _generate_page(filename, template_name='shared'):
         _generate_template(template_name)
 
 
-def _generate_markdown(md_name):
+def _generate_markdown(*args):
+    md_name = args[0]
     console.debug(f"Markdown generation requested for content {bold}{md_name}{reset}")
     md_content = f"# {md_name}\n\nThis is your new markdown file."
 
@@ -70,7 +77,8 @@ def _generate_markdown(md_name):
         md_file.write(md_content.encode())
 
 
-def _generate_template(template_name):
+def _generate_template(*args):
+    template_name = args[0]
     console.debug(f"Template generation requested for template {bold}{template_name}{reset}")
 
     config = _get_project_config()
@@ -81,7 +89,8 @@ def _generate_template(template_name):
         template_file.write(content.encode())
 
 
-def _generate_style(style_name):
+def _generate_style(*args):
+    style_name = args[0]
     scss_content = f"// File:      {style_name}.scss\n" + \
                    f"// Generated: {datetime.now().strftime('%Y-%m-%d')}" + \
                    '''
@@ -98,7 +107,8 @@ def _generate_style(style_name):
     console.info(f"Created SCSS file at {bold}{scss_file_path}{reset}")
 
 
-def _generate_data(filename):
+def _generate_data(*args):
+    filename = args[0]
     file_content = '[]'
     file_path = path.join(getcwd(), f"src/data/{filename}.json")
     with open(file_path, 'wb') as data_file:
