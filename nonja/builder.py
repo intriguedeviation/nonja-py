@@ -2,7 +2,7 @@ import json
 import sys
 import importlib
 import lxml.etree as et
-from os import path, walk, getcwd, makedirs, system, unlink
+from os import path, walk, getcwd, makedirs, unlink, sep
 from jinja2 import Environment, FileSystemLoader
 from lxml.builder import E
 from datetime import datetime
@@ -16,6 +16,7 @@ import nonja.console as console
 import nonja.filters as filters
 import nonja.functions as functions
 
+_project_root = getcwd()
 
 def _run_package_manager():
     npm_lock_path = "./package-lock.json"
@@ -25,7 +26,7 @@ def _run_package_manager():
         if path.exists(npm_lock_path):
             subprocess.run(["npm", "run", "sass:build"], check=True)
         elif path.exists(yarn_lock_path):
-            subprocess.run("yarn", "sass:build")
+            subprocess.run(["yarn", "sass:build"])
         else:
             console.error("Package lock files could not be found, ignoring.")
     except subprocess.CalledProcessError as e:
@@ -33,7 +34,7 @@ def _run_package_manager():
 
 
 def rebuild_project():
-    build_folder_path = path.join(".", "build")
+    build_folder_path = path.join(_project_root, "build")
     
     if path.exists(build_folder_path):
         shutil.rmtree(build_folder_path, ignore_errors=True)
@@ -49,16 +50,16 @@ def build_project(**args):
     if include_assets_flag in args and args.get(include_assets_flag):
         _migrate_assets()
 
-    content_folder_path = path.join(getcwd(), "src/content")
+    content_folder_path = path.join(_project_root, "src/content")
     if not path.exists(content_folder_path):
         console.error(f"Content source path {bold}{content_folder_path}{reset} could not be found")
         exit(0)
     else:
         console.info(f"Processing content from folder {bold}{content_folder_path}{reset}")
 
-    x_filter_mod_name = path.join(getcwd(), "filters.py")
+    x_filter_mod_name = path.join(_project_root, "filters.py")
     if path.exists(x_filter_mod_name):
-        sys.path.insert(0, getcwd())
+        sys.path.insert(0, _project_root)
 
     console.info("Setting up Jinja environment.")
     env = Environment(
@@ -124,14 +125,21 @@ def build_project(**args):
 
 
 def _write_sitemap():
-    package_file_path = path.join(getcwd(), "package.json")
-    with open(package_file_path, "rb") as package_file:
+    package_file_path = path.join(_project_root, "package.json")
+    with open(package_file_path, "r", encoding="utf-8") as package_file:
         package_content = json.load(package_file)
 
     project_config = package_content.get("nonjaProject")
-    project_base_url = project_config.get("domain")
+    if not project_config:
+        console.error("Nonja project node missing from package manifest. Halting.")
+        return
 
-    build_folder_path = path.join(getcwd(), "build")
+    project_base_url = project_config.get("domain")
+    if not project_base_url:
+        console.error("Missing domain in project config. Halting.")
+        return
+
+    build_folder_path = path.join(_project_root, "build")
     sitemap_node_count = 0
     sitemap_content = E.sitemap(
         {
@@ -144,8 +152,10 @@ def _write_sitemap():
                 continue
 
             file_path = (path.join(cwd, filename)
-                         .replace(path.join(getcwd(), "build"), project_base_url)
-                         .replace("index.html", ""))
+                         .replace(sep, "/")
+                         .replace(path.join(_project_root, "build"), project_base_url)
+                         .replace("index.html", "")
+                         .rstrip("/"))
 
             sitemap_content.append(E.url(
                 E.loc(file_path),
@@ -153,7 +163,7 @@ def _write_sitemap():
             ))
             sitemap_node_count += 1
 
-    sitemap_file_path = path.join(getcwd(), "build/sitemap.xml")
+    sitemap_file_path = path.join(_project_root, "build/sitemap.xml")
     with open(sitemap_file_path, "wb") as sitemap_file:
         sitemap_file.write(et.tostring(sitemap_content, pretty_print=True))
 
@@ -162,21 +172,23 @@ def _write_sitemap():
 
 def _write_robots_file():
     """Writes the contents of a fixed robots.txt file."""
-    robots_file_content = """# www.robotstxt.org/
 
-# Allow crawling for all content
-User-agent: *
-Disallow:
-"""
-    robots_file_path = "./build/robots.txt"
-    with open(robots_file_path, "wb") as robots_file:
-        robots_file.write(robots_file_content.encode())
+    robots_file_content = (
+        "# www.robotstxt.org\n\n"
+        "# Allow crawling for all content\n"
+        "User-agent: *\n"
+        "Disallow:\n"
+    )
+
+    robots_file_path = path.join(_project_root, "build", "robots.txt")
+    with open(robots_file_path, "w", encoding="utf-8") as robots_file:
+        robots_file.write(robots_file_content)
 
     console.info(f"Wrote {bold}robots.txt{reset} for the project.")
 
 
 def _get_project_config():
-    package_file_path = path.join(getcwd(), "package.json")
+    package_file_path = path.join(_project_root, "package.json")
     with open(package_file_path, "rb") as package_file:
         package_content = load(package_file)
 
@@ -184,14 +196,14 @@ def _get_project_config():
 
 def _migrate_assets():
     image_assets_path = "./src/images"
-    image_assets_folder = path.join(getcwd(), image_assets_path)
+    image_assets_folder = path.join(_project_root, image_assets_path)
     output_image_path = "./build/assets/images"
-    output_image_folder = path.join(getcwd(), output_image_path)
+    output_image_folder = path.join(_project_root, output_image_path)
 
     drawings_assets_path = "./src/drawings"
-    drawings_assets_folder = path.join(getcwd(), drawings_assets_path)
+    drawings_assets_folder = path.join(_project_root, drawings_assets_path)
     output_drawings_path = "./build/assets/drawings"
-    output_drawings_folder = path.join(getcwd(), output_drawings_path)
+    output_drawings_folder = path.join(_project_root, output_drawings_path)
 
     jpeg_ext = ".jpg"
     png_ext = ".png"
