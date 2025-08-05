@@ -30,9 +30,11 @@ def _run_package_manager():
 
 
 def rebuild_project():
-    # TODO: Need to use file removal methods from Python instead of this.
     build_folder_path = path.join(".", "build")
-    system(f"rm -rf {build_folder_path}")
+    
+    if path.exists(build_folder_path):
+        shutil.rmtree(build_folder_path, ignore_errors=True)
+
     build_project()
 
 
