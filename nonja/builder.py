@@ -9,6 +9,7 @@ from datetime import datetime
 from json import load
 import shutil
 from PIL import Image
+import subprocess
 
 from nonja.style import bold, reset
 import nonja.console as console
@@ -17,16 +18,18 @@ import nonja.functions as functions
 
 
 def _run_package_manager():
-    # TODO: Feels like there might be a better manner of handling invoking the package manager.
     npm_lock_path = "./package-lock.json"
     yarn_lock_path = "./yarn.lock"
 
-    if path.exists(npm_lock_path):
-        system("npm run sass:build")
-    elif path.exists(yarn_lock_path):
-        system("yarn sass:build")
-    elif not path.exists(npm_lock_path) and not path.exists(yarn_lock_path):
-        console.error("Package lock files could not be found, ignoring.")
+    try:
+        if path.exists(npm_lock_path):
+            subprocess.run(["npm", "run", "sass:build"], check=True)
+        elif path.exists(yarn_lock_path):
+            subprocess.run("yarn", "sass:build")
+        else:
+            console.error("Package lock files could not be found, ignoring.")
+    except subprocess.CalledProcessError as e:
+        console.error(f"Failed to run package manager: {e}")
 
 
 def rebuild_project():
