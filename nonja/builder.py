@@ -161,7 +161,7 @@ def _write_sitemap():
 
 
 def _write_robots_file():
-    # Create robots.txt
+    """Writes the contents of a fixed robots.txt file."""
     robots_file_content = """# www.robotstxt.org/
 
 # Allow crawling for all content
